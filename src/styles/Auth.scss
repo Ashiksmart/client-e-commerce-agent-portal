@@ -1,0 +1,159 @@
+@import "../utils/Variables.scss";
+
+.auth_container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 50px;
+  background-color: $XXlight-grey;
+  padding: 50px 0px;
+  overflow: auto;
+}
+.auth_box {
+  width: 100%;
+  max-width: 300px;
+  background-color: $white;
+  padding: 20px;
+  border-radius: 12px;
+}
+.auth_himgb {
+  width: auto;
+  height: 100px;
+  border: 2px solid $XXlight-grey;
+  border-radius: 8px;
+  position: relative;
+  margin-top: 100px;
+}
+.prof_imgb {
+  width: 100px;
+  height: 100px;
+  border: 2px solid $XXlight-grey;
+  border-radius: 8px;
+  position: relative;
+}
+.auth_himg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.prof_sec {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+  gap: 15px;
+  width: 100%;
+
+  &_sub {
+    display: flex;
+    gap: 20px;
+  }
+}
+.prof_del {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+}
+.prof_del .list_box_btn {
+  min-width: auto;
+  text-align: center;
+  padding: 4px;
+}
+.fld_bg {
+  background-color: $XXXlight-grey;
+}
+.fld_box {
+  width: 100%;
+  padding-bottom: 4px;
+
+  &_lbl {
+    font-size: $small;
+    color: $dark-grey;
+  }
+  &_fld {
+    height: 35px;
+  }
+  &_inp {
+    background-color: $Xlight-grey;
+    border: 1px solid $Xlight-grey;
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    outline: none;
+    padding: 3px 6px;
+    &:hover {
+      border-color: $Xlight-grey;
+    }
+    &:focus {
+      border-color: $primary;
+      background-color: $light-primary;
+      box-shadow: 0px 0px 0px 3px $dark-primary;
+    }
+  }
+  &_btn {
+    height: 35px;
+    padding: 6px 10px;
+    border-radius: 50px;
+    text-align: center;
+    font-size: $small;
+    cursor: pointer;
+    margin-left: 0px;
+    margin-right: auto;
+    box-shadow: 0px 3px 15px 0px $light-shadow;
+    user-select: none;
+    min-width: 120px;
+    background-color: $primary;
+    color: $white;
+    margin-top: 20px;
+    margin-left: 0px;
+    margin-right: auto;
+    &:hover {
+    }
+  }
+  &_lnk {
+    color: $primary;
+    font-size: $small;
+    cursor: pointer;
+    user-select: none;
+  }
+  &_msg {
+    font-size: $small;
+    padding: 3px 0px;
+  }
+}
+.auth_head {
+  margin-bottom: 15px;
+}
+.auth_ft {
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  &_lbl {
+    color: $dark-grey;
+    font-size: $small;
+  }
+  &_lnk {
+    color: $primary;
+    font-size: $small;
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+@media screen and (min-width: 350px) {
+  .auth_box {
+    max-width: 400px;
+  }
+  .chead_rgt .list_box_btn {
+    margin-right: 0px;
+  }
+}

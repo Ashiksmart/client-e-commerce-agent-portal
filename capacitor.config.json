@@ -1,0 +1,11 @@
+{
+  "appId": "io.ionic.b2b",
+  "appName": "b2b",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {},
+  "server": {
+    "androidScheme": "https"
+  }
+}

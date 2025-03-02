@@ -1,0 +1,51 @@
+// Colors
+$primary: var(--primary);
+$dark-primary: var(--secondary);
+$Xdark-primary: #471649;
+$light-primary: rgb(226, 238, 255);
+$Xlight-primary:rgb(184, 214, 255);
+$orange-l500: #e89611;
+$secondary: #631567;
+$white: white;
+$lgt-white: rgba(255, 255, 255, 0.5);
+$blue: #0087ff; 
+$dk-blue: #00437e; 
+
+$dk-primary: #fabaff;
+
+$prim-grad: linear-gradient(90deg, $light-primary 0%, $dk-primary 100%);
+
+$XXXlight-grey: rgb(250, 250, 250);
+$XXlight-grey: rgb(248, 248, 248);
+$Xlight-grey: rgb(243, 243, 243);
+$light-grey: rgb(221, 221, 221);
+$grey: rgb(184, 184, 184);
+$dark-grey: rgb(134, 134, 134);
+$grey: rgb(184, 184, 184);
+$Xdark-grey:rgb(100, 100, 100);
+
+$black: black;
+$back-black:rgba(0, 0, 0, 0.05);
+
+// Status
+$Xlight-red: #ffdcdc;
+$light-red: rgb(255, 232, 232);
+$red: rgb(204, 75, 75);
+$dark-red: rgb(121, 17, 17);
+$lgreen:rgb(212, 255, 242);
+$green: #00855a;
+$dark-green: #1d6e54;
+
+//Shadow
+$Xlight-shadow: rgba(140, 149, 159, 0.4);
+$light-shadow: rgba(140, 149, 159, 0.09);
+$shadow: rgba(140, 149, 159, 0.7);
+
+// Font Sizes
+$XXXlarger: 2rem;
+$XXlarger: 1.6rem;
+$Xlarger: 1.2rem;
+$larger: 1rem;
+$small: 0.9rem;
+$Xsmall: 0.6rem;
+$XXsmall: 0.8rem;
