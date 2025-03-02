@@ -1,9 +1,9 @@
 //production
 // const currentDomain = extractDomainWithoutSubdomains(window.location.hostname);
-const currentDomain = 'bas-mart.com'
-const BASE_URL = `https://service.${currentDomain}`
-const BASE_URL_WOP = `https://${currentDomain}/accountimg`
-const AUTH_BASE_URL = `https://service.${currentDomain}`
+// const currentDomain = 'bas-mart.com'
+// const BASE_URL = `https://service.${currentDomain}`
+// const BASE_URL_WOP = `https://${currentDomain}/accountimg`
+// const AUTH_BASE_URL = `https://service.${currentDomain}`
 
 
 // development
@@ -11,10 +11,10 @@ const AUTH_BASE_URL = `https://service.${currentDomain}`
 // const BASE_URL_WOP = `https://${currentDomain}/accountimg`
 // const AUTH_BASE_URL = `https://service.${currentDomain}`
 
-// const currentDomain = 'localhost'
-// const BASE_URL = 'http://174.138.123.234:7004'
-// const BASE_URL_WOP = 'http://174.138.123.234'
-// const AUTH_BASE_URL = 'http://174.138.123.234:7004'
+const currentDomain = 'localhost'
+const BASE_URL = 'https://server-e-commerce-logic-service.onrender.com'
+const BASE_URL_WOP = 'http://localhost'
+const AUTH_BASE_URL = 'https://server-e-commerce-api-auth-service.onrender.com'
 
 // const currentDomain = 'http://174.138.123.234'
 // const BASE_URL = 'http://localhost:8000'
