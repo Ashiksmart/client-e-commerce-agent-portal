@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from "react";
 import Slider from "react-slick";
 import Banner from "../components/Banner";
@@ -12,178 +13,211 @@ import { OfferCovers, AppLoader } from "../components/CommonEssentials";
 import { useDispatch } from "react-redux";
 import serviceProxy, { serviceProxyUpdate } from "../services/serviceProxy";
 import Constants from "../constants";
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode';
 import DynamicPage from "../components/DynamicPage/DynamicPage";
 import { SET_CATEGORY_DETAILS } from "../redux/slices/store";
 import _ from "lodash";
+
 const Home = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [displaydata, setdisplaydata] = useState([])
+  const [displayData, setDisplayData] = useState([]);
   const [categoryDetails, setCategoryDetails] = useState([]);
-  const [Flow, setFlow] = useState([]);
+  const [flow, setFlow] = useState([]);
   const [trigger, setTrigger] = useState(false);
+  
+  serviceProxy.localStorage.setPrefixKey("b4b");
 
-  serviceProxy.localStorage.setPrefixKey("b4b")
-
+  // Check for login status and set default values
   useEffect(() => {
-
-    const isLoggedIn = serviceProxy.localStorage.getItem('isLoggedIn')
+    const isLoggedIn = serviceProxy.localStorage.getItem('isLoggedIn');
+    
     if (!isLoggedIn) {
-      serviceProxy.localStorage.setItem("cityCode", "")
-      serviceProxy.localStorage.setItem("cityName", "All City")
+      serviceProxy.localStorage.setItem("cityCode", "");
+      serviceProxy.localStorage.setItem("cityName", "All City");
     }
-    // serviceProxy.localStorage.setItem("searchQuery", "")
+
+    // Set account info if not already present
     if (serviceProxy.localStorage.getItem("account_info") === "") {
       serviceProxy.account.domain(Constants.DOMAIN).then((res) => {
         if (res.status === 200) {
-          serviceProxy.localStorage.setItem("account_details", res.data.data)
-          let account = {
-            account: res.data.data.account_id,
-            image_domain: res.data.data.api_domain.wop,
-            api: res.data.data.api_domain.api,
-            auth: res.data.data.api_domain.auth
-          }
-          serviceProxy.localStorage.setItem("account_info", account)
-          serviceProxy.localStorage.setItem("token", res.data.data.temp_token)
-          serviceProxyUpdate()
-          fetchCategory()
+          setAccountInfo(res.data.data);
+          fetchCategory();
         }
-      })
+      });
     } else {
-      fetchCategory()
+      fetchCategory();
     }
 
     if (!serviceProxy.auth.getJWTToken()) {
-      serviceProxy.localStorage.setItem('isLoggedIn', false)
+      serviceProxy.localStorage.setItem('isLoggedIn', false);
     }
-  }, [])
+  }, []);
 
+  // Set account information in local storage
+  const setAccountInfo = (data) => {
+    serviceProxy.localStorage.setItem("account_details", data);
+    const account = {
+      account: data.account_id,
+      image_domain: data.api_domain.wop,
+      api: data.api_domain.api,
+      auth: data.api_domain.auth,
+    };
+    serviceProxy.localStorage.setItem("account_info", account);
+    serviceProxy.localStorage.setItem("token", data.temp_token);
+    serviceProxyUpdate();
+  };
+
+  // Fetch category data
   const fetchCategory = () => {
-    fetchFlow()
-    serviceProxy.business
-      .find(Constants.Application, "category_new", "view", { is_active: { $eq: "Y" }, account_id: { $eq: accountId() } }, [], null, null, [], [{
-        "model": "market_place",
-        "bindAs": {
-          "name": "app_id",
-          "value": "label"
+    fetchFlow();
+    
+    const query = {
+      is_active: { $eq: "Y" },
+      account_id: { $eq: accountId() }
+    };
+    
+    serviceProxy.business.find(
+      Constants.Application,
+      "category_new",
+      "view",
+      query,
+      [],
+      null,
+      null,
+      [],
+      [
+        {
+          model: "market_place",
+          bindAs: {
+            name: "app_id",
+            value: "label",
+          },
+          key: {
+            foreign: "app_id",
+            primary: "app_id",
+            rules: { account_id: accountId() },
+          },
+          fields: ["label", "app_icon"]
         },
-        "key": {
-          "foreign": "app_id",
-          "primary": "app_id",
-          "rules": { account_id: accountId() }
-        },
-        "fields": [
-          "label", "app_icon"
-        ]
-      },])
-      .then((response) => {
-        if (response.records.length > 0) {
+      ]
+    )
+    .then((response) => {
+      if (response.records.length > 0) {
+        restructureCategory(response);
+        setDisplayData(selectRandomCategories(response.records));
+      } else {
+        setCategoryDetails([]);
+        setDisplayData([]);
+      }
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching category:", error);
+      setLoading(false);
+    });
+  };
 
-          restructureCategory(response)
-          let products = []
-          products = response.records
-          let output = [];
-          let remainingIndices = Array.from(products.keys());
-
-          // Randomly select 5 unique elements from the products array
-          for (let i = 0; i < 20; i++) {
-            let randomIndex = Math.floor(Math.random() * remainingIndices.length);
-            let selectedIndex = remainingIndices[randomIndex];
-            if (products[selectedIndex] !== undefined) {
-              products[selectedIndex].details = JSON.parse(products[selectedIndex].details)
-              let insertproduct = { ...products[selectedIndex], ...response.associate_to[selectedIndex][0] }
-              output.push(insertproduct);
-
-            }
-            remainingIndices.splice(randomIndex, 1);
-
-          }
-
-          setdisplaydata(output)
-
-
-
-        } else {
-          setCategoryDetails([])
-          setdisplaydata([])
-        }
-        setLoading(false)
-      }).catch((error) => {
-        console.log("error : ", error);
-        setLoading(false)
-      })
-  }
+  // Restructure category data into groups
   const restructureCategory = (data) => {
-    let groupedData = data.records.reduce((acc, item, i) => {
+    const groupedData = data.records.reduce((acc, item, i) => {
       item = { ...item, ...data.associate_to[i][0] };
 
       if (!acc[item.label]) {
         acc[item.label] = [];
       }
 
-
       acc[item.label].push(item);
-
 
       return acc;
     }, {});
-    console.log(groupedData, "groupedDatagroupedDatagroupedData")
-    let formattedData = Object.entries(groupedData).map(([groupName, groupValue]) => {
-      return { name: groupName, value: groupValue, icon: groupValue[0].app_icon, app_id: groupValue[0].app_id };
-    });
+
+    const formattedData = Object.entries(groupedData).map(([groupName, groupValue]) => ({
+      name: groupName,
+      value: groupValue,
+      icon: groupValue[0].app_icon,
+      app_id: groupValue[0].app_id,
+    }));
 
     setCategoryDetails(formattedData);
   };
 
-  const fetchFlow = () => {
-    const account_id = accountId()
-    const detailsQuery = {
-      account_id: { $eq: account_id },
-      "app_id": {
-        "$eq": "0"
-      },
-      "page_type": {
-        "$eq": "client"
+  // Randomly select 20 unique categories from the available products
+  const selectRandomCategories = (products) => {
+    let remainingIndices = Array.from(products.keys());
+    const selectedProducts = [];
+
+    for (let i = 0; i < 20; i++) {
+      const randomIndex = Math.floor(Math.random() * remainingIndices.length);
+      const selectedIndex = remainingIndices[randomIndex];
+
+      if (products[selectedIndex]) {
+        products[selectedIndex].details = JSON.parse(products[selectedIndex].details);
+        const insertProduct = { ...products[selectedIndex], ...products[selectedIndex] };
+        selectedProducts.push(insertProduct);
       }
+
+      remainingIndices.splice(randomIndex, 1);
     }
 
-    serviceProxy.business.find(Constants.Application, "workflow_status", "view", detailsQuery, [], 1, 10, [])
-      .then((response) => {
-        if (response.records.length > 0) {
-          setFlow(response.records)
-        }
-        setLoading(false)
-      }).catch((error) => {
-        setLoading(false)
-      })
-  }
+    return selectedProducts;
+  };
 
-  // dispatch(SET_CATEGORY_DETAILS(categoryDetails))
+  // Fetch flow data
+  const fetchFlow = () => {
+    const query = {
+      account_id: { $eq: accountId() },
+      "app_id": { $eq: "0" },
+      "page_type": { $eq: "client" },
+    };
+
+    serviceProxy.business.find(
+      Constants.Application,
+      "workflow_status",
+      "view",
+      query,
+      [],
+      1,
+      10,
+      []
+    )
+    .then((response) => {
+      if (response.records.length > 0) {
+        setFlow(response.records);
+      }
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching flow:", error);
+      setLoading(false);
+    });
+  };
+
   const navigation = useNavigate();
 
+  // Get the account ID
   const accountId = () => {
-    const isLoggedIn = serviceProxy.localStorage.getItem('isLoggedIn')
-    return isLoggedIn ? jwtDecode(serviceProxy.auth.getJWTToken()).account_id : serviceProxy.localStorage.getItem('account_info').account
-  }
+    const isLoggedIn = serviceProxy.localStorage.getItem('isLoggedIn');
+    if (isLoggedIn) {
+      return jwtDecode(serviceProxy.auth.getJWTToken()).account_id;
+    } else {
+      return serviceProxy.localStorage.getItem('account_info').account;
+    }
+  };
 
+  // Display loader while data is being fetched
   if (loading) {
-    return (
-      <AppLoader />
-    );
+    return <AppLoader />;
   }
 
   return (
     <>
       <Header setTrigger={setTrigger} services={categoryDetails} />
-      <div className="cbody" style={{
-        paddingTop: 50
-      }}>
-
+      <div className="cbody" style={{ paddingTop: 50 }}>
         <div className="gry_bg">
           <div className="container container_center">
-            {<CategoryListing alldata={categoryDetails} services={displaydata} navigation={navigation} />}
-            {Flow.length > 0 && <DynamicPage Flow={Flow}></DynamicPage>}
+            <CategoryListing alldata={categoryDetails} services={displayData} navigation={navigation} />
+            {flow.length > 0 && <DynamicPage Flow={flow} />}
           </div>
         </div>
       </div>
