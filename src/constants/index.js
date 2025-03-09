@@ -13,7 +13,7 @@
 
 const currentDomain = 'localhost'
 const BASE_URL = 'https://server-e-commerce-logic-service.onrender.com'
-const BASE_URL_WOP = 'http://localhost'
+const BASE_URL_WOP = 'https://plum-wasp-686705.hostingersite.com/'
 const AUTH_BASE_URL = 'https://server-e-commerce-api-auth-service.onrender.com'
 
 // const currentDomain = 'http://174.138.123.234'

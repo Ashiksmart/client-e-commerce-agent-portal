@@ -24,7 +24,7 @@ const CategoryPage = () => {
   const location = useLocation();
   const categorydata = location?.state?.categoryquery
 
-  const [Flow, setFlow] = useState([]);
+  const [flow, setFlow] = useState([]);
   const [categoryDetails, setCategoryDetails] = useState([]);
   const navigation = useNavigate();
   const accountId = () => {
@@ -112,7 +112,7 @@ const CategoryPage = () => {
               />
             )}
           </div>
-          {Flow.length > 0 && <DynamicPage Flow={Flow}></DynamicPage>}
+          {flow.length > 0 && <DynamicPage Flow={flow}></DynamicPage>}
         </div>
       </div>
       <Footer />
