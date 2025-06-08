@@ -209,7 +209,7 @@ const RecommendedProducts = () => {
           return (
             <>
               {r?.products?.length > 0 && (
-                <div className="no_rec_cont">
+                <div key={r.id} className="no_rec_cont">
                   <div className="ctitle">
                     <div className="chead_title">
                       {r.title}

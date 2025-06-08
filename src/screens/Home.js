@@ -1,25 +1,18 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from "react";
-import Slider from "react-slick";
-import Banner from "../components/Banner";
 import Header from "../components/Header";
-import { PrevArrow, NextArrow } from "../components/SliderEssentials";
-import UnderConstruction from "../components/UnderConstruction";
 import CategoryListing from "../components/CategoryListing";
 import "../styles/Common.scss";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
-import { OfferCovers, AppLoader } from "../components/CommonEssentials";
-import { useDispatch } from "react-redux";
+import { AppLoader } from "../components/CommonEssentials";
 import serviceProxy, { serviceProxyUpdate } from "../services/serviceProxy";
 import Constants from "../constants";
 import { jwtDecode } from 'jwt-decode';
 import DynamicPage from "../components/DynamicPage/DynamicPage";
-import { SET_CATEGORY_DETAILS } from "../redux/slices/store";
 import _ from "lodash";
 
 const Home = () => {
-  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [displayData, setDisplayData] = useState([]);
   const [categoryDetails, setCategoryDetails] = useState([]);
@@ -27,7 +20,6 @@ const Home = () => {
   const [trigger, setTrigger] = useState(false);
   
   serviceProxy.localStorage.setPrefixKey("b4b");
-
   // Check for login status and set default values
   useEffect(() => {
     const isLoggedIn = serviceProxy.localStorage.getItem('isLoggedIn');
@@ -42,11 +34,11 @@ const Home = () => {
       serviceProxy.account.domain(Constants.DOMAIN).then((res) => {
         if (res.status === 200) {
           setAccountInfo(res.data.data);
-          fetchCategory();
+           fetchFlow();
         }
       });
     } else {
-      fetchCategory();
+       fetchFlow();
     }
 
     if (!serviceProxy.auth.getJWTToken()) {
@@ -70,38 +62,12 @@ const Home = () => {
 
   // Fetch category data
   const fetchCategory = () => {
-    fetchFlow();
-    
     const query = {
       is_active: { $eq: "Y" },
       account_id: { $eq: accountId() }
     };
     
-    serviceProxy.business.find(
-      Constants.Application,
-      "category_new",
-      "view",
-      query,
-      [],
-      null,
-      null,
-      [],
-      [
-        {
-          model: "market_place",
-          bindAs: {
-            name: "app_id",
-            value: "label",
-          },
-          key: {
-            foreign: "app_id",
-            primary: "app_id",
-            rules: { account_id: accountId() },
-          },
-          fields: ["label", "app_icon"]
-        },
-      ]
-    )
+    serviceProxy.business.find( Constants.Application, "category_new", "view", query, [], null, null, [], [ { model: "market_place", bindAs: { name: "app_id", value: "label", }, key: { foreign: "app_id", primary: "app_id", rules: { account_id: accountId() }, }, fields: ["label", "app_icon"] }, ] )
     .then((response) => {
       if (response.records.length > 0) {
         restructureCategory(response);
@@ -185,12 +151,14 @@ const Home = () => {
       if (response.records.length > 0) {
         setFlow(response.records);
       }
-      setLoading(false);
+      fetchCategory()
     })
     .catch((error) => {
       console.error("Error fetching flow:", error);
       setLoading(false);
     });
+    document.documentElement.style.setProperty('--primary', serviceProxy.localStorage.getItem("account_details").primay_color)
+    document.documentElement.style.setProperty('--secondary', serviceProxy.localStorage.getItem("account_details").secondary_color)
   };
 
   const navigation = useNavigate();

@@ -28,7 +28,7 @@ const SignUp = () => {
     const validationSchema = Yup.object().shape({
         first_name: Yup.string().required("Name is required"),
         last_name: Yup.string().optional(),
-        phone_number: Yup.string().matches(/^[0-9]+$/, "Mobile must be numeric").required("Mobile is required"),
+        phone_number: Yup.string().matches(/^[0-9]+$/, "Mobile must be numeric").max(10).required("Mobile is required"),
         email: Yup.string()
             .required('Email is required')
             .email('Invalid email address'),
@@ -44,47 +44,76 @@ const SignUp = () => {
         onSubmit: async (value, { resetForm }) => {
             serviceProxy.localStorage.setItem("userinfo", value)
             console.log(value)
-            serviceProxy.otp.send("email", {
-                "email": value.email,
-                "type": 1,
-            }).then((res) => {
-                if (res.status === 201) {
-
-                    serviceProxy.notification.send(serviceProxy.localStorage.getPrefixKey(), Constants.MODULES.OneTimePassword, { id: res.data.data.id.toString(), email: res.data.data.email, operation: Constants.CREATE_MODE , additional_info:value }).then((res) => {
-                        if (res.status === 200) {
-                            resetForm();
-                            setTimeout(() => {
-                                navigate('/verify-otp')
-                            }, 3000);
-                            setSnackbarMessage("Please Check Your Mail for Otp");
-                            setOpenSnackbar(true);
-                        } else {
-
+             serviceProxy.user.create('Client', value).then((res) => {
+                            if (res.status === 201) {
+                                resetForm();
+                                serviceProxy.localStorage.setItem('token', res.data.data.token)
+                                serviceProxy.localStorage.setItem('isLoggedIn', true)
+                                const user_id = jwtDecode(res.data.data.token)?.id
+                                serviceProxy.localStorage.setItem("userId", user_id)
+                                serviceProxy.localStorage.removeItem('userinfo')
+                                navigate('/')
+                            } else if(res.response.status===400 && res.response.data.message==="Client Role User Limit Reached"){
+                                setSnackbarError(true)
+                                setSnackbarMessage("User limit reached");
+                                setOpenSnackbar(true);
+                                serviceProxy.localStorage.removeItem('userinfo')
+                                setTimeout(() => {
+                                    navigate('/')
+                                }, 3000);
+                            }else {
+                                setSnackbarError(true)
+                                setSnackbarMessage("Invalid User Input Data");
+                                setOpenSnackbar(true);
+                                serviceProxy.localStorage.removeItem('userinfo')
+                            }
+                        }).catch((err) => {
                             setSnackbarError(true)
-                            setSnackbarMessage("Failed");
+                            setSnackbarMessage("Invalid User Input Data");
                             setOpenSnackbar(true);
-                        }
+                            serviceProxy.localStorage.removeItem('userinfo')
+                        })
+            // serviceProxy.otp.send("email", {
+            //     "email": value.email,
+            //     "type": 1,
+            // }).then((res) => {
+            //     if (res.status === 201) {
 
-                    }).catch((err) => {
-                        console.log("ERR : ", err);
-                        setSnackbarError(true)
-                        setSnackbarMessage("Failed");
-                        setOpenSnackbar(true);
-                    });
+            //         serviceProxy.notification.send(serviceProxy.localStorage.getPrefixKey(), Constants.MODULES.OneTimePassword, { id: res.data.data.id.toString(), email: res.data.data.email, operation: Constants.CREATE_MODE , additional_info:value }).then((res) => {
+            //             if (res.status === 200) {
+            //                 resetForm();
+            //                 setTimeout(() => {
+            //                     navigate('/verify-otp')
+            //                 }, 3000);
+            //                 setSnackbarMessage("Please Check Your Mail for Otp");
+            //                 setOpenSnackbar(true);
+            //             } else {
 
-                } else {
+            //                 setSnackbarError(true)
+            //                 setSnackbarMessage("Failed");
+            //                 setOpenSnackbar(true);
+            //             }
 
-                    setSnackbarError(true)
-                    setSnackbarMessage("Failed");
-                    setOpenSnackbar(true);
-                }
+            //         }).catch((err) => {
+            //             console.log("ERR : ", err);
+            //             setSnackbarError(true)
+            //             setSnackbarMessage("Failed");
+            //             setOpenSnackbar(true);
+            //         });
 
-            }).catch((err) => {
-                console.log("ERR : ", err);
-                setSnackbarError(true)
-                setSnackbarMessage("Failed");
-                setOpenSnackbar(true);
-            });
+            //     } else {
+
+            //         setSnackbarError(true)
+            //         setSnackbarMessage("Failed");
+            //         setOpenSnackbar(true);
+            //     }
+
+            // }).catch((err) => {
+            //     console.log("ERR : ", err);
+            //     setSnackbarError(true)
+            //     setSnackbarMessage("Failed");
+            //     setOpenSnackbar(true);
+            // });
 
         },
     });

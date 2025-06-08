@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Header.scss';
-import { CodeSandboxSquareFilled, OrderedListOutlined, SearchOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
+import { SearchOutlined, ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from 'react';
 import { SET_CART_DETAILS } from '../redux/slices/store';
@@ -44,7 +44,19 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
 
     // Fetch category details
     useEffect(() => {
-        const fetchCategoryDetails = async () => {
+        fetchCategoryDetails();
+        fetchCities();
+        if (!currentPath.includes('/products')) {
+            serviceProxy.localStorage.setItem("searchQuery", "");
+        }
+    }, []);
+
+    useEffect(()=>{
+       setFilteredCities(cities);
+    }, [cities])
+
+
+    const fetchCategoryDetails = async () => {
             try {
                 const response = await serviceProxy.business.find(
                     Constants.Application, "market_place", "view", {
@@ -61,17 +73,15 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
             }
         };
 
-        fetchCategoryDetails();
-    }, []);
-
-    // Fetch cities
-    useEffect(() => {
         const fetchCities = async () => {
             try {
                 const response = await serviceProxy.business.find(
                     Constants.Application, Constants.MODULES.LocationCity, "view", { is_active: 'Y' }, ["city_name", "city_code"], 1, 1000000, [{ column: "city_name", order: "asc" }]
                 );
                 setCities(response.records);
+                const term = serviceProxy.localStorage.getItem("cityName")
+                const filtered = term == "All Cities" ? cities : cities.filter((c) => c.city_name.toLowerCase().includes(term.toLowerCase()));
+                setFilteredCities(filtered)
                 if (response.records?.length) {
                     setSelectedCity(serviceProxy.localStorage.getItem('cityCode')?.toString() || '');
                     if (setCityList) setCityList(response.records);
@@ -80,13 +90,6 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
                 console.error("Error fetching cities:", error);
             }
         };
-
-        fetchCities();
-
-        if (!currentPath.includes('/products')) {
-            serviceProxy.localStorage.setItem("searchQuery", "");
-        }
-    }, []);
 
     // Fetch cart details
     useEffect(() => {
@@ -123,7 +126,7 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
         event.stopPropagation();
         const term = event.target.value.toLowerCase();
         setSearchTerm(term);
-        const filtered = cities.filter((c) => c.city_name.toLowerCase().includes(term));
+        const filtered = cities.filter((c) => c.city_name.toLowerCase().includes(term.toLowerCase()));
         setFilteredCities(filtered);
     };
 
@@ -138,6 +141,8 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
             navigate(`/products`, { state: { query: buildFilterQuery(cityCode) } });
         }
         setSearchTerm('');
+        setFilteredCities(cities);
+        setOptOpen(false)
     };
 
     const buildFilterQuery = (cityCode) => {
@@ -182,8 +187,8 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
 
             {!(currentPath !== '/' && !currentPath.includes('/profile') && !currentPath.includes('/category') && !currentPath.includes('/products') && !currentPath.includes('/supplier-profile') && !currentPath.includes('/details')) &&
                 <div className={`chead_searchb ${searchFoc ? "search_foc_active" : ""}`}>
-                    <div className='chead_loc' onClick={() => setOptOpen(prev => !prev)}>
-                        <div className='chead_loc_sec'>
+                    <div className='chead_loc'>
+                        <div className='chead_loc_sec' onClick={() => setOptOpen(prev => !prev)}>
                             <span className='chead_loc_icob'>
                                 <img className='chead_loc_ico' src={require('../assets/png/location-pin.png')} alt='location-pin' />
                             </span>
@@ -212,7 +217,7 @@ const Header = ({ services, trigger, setTrigger, setCityList }) => {
                             </div>
                         }
                     </div>
-
+                    
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <input
                             type="text"
