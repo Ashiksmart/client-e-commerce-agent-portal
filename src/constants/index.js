@@ -16,10 +16,10 @@ const BASE_URL = 'https://server-e-commerce-logic-service.onrender.com'
 const BASE_URL_WOP = 'https://dreamsparks.site/'
 const AUTH_BASE_URL = 'https://server-e-commerce-api-auth-service.onrender.com'
 
-// const currentDomain = 'localhost'
+// const currentDomain = 'http://174.138.123.234'
 // const BASE_URL = 'http://localhost:8000'
-// const BASE_URL_WOP = 'http://dreamsparks.site'
-// const AUTH_BASE_URL = `http://localhost:8001`
+// const BASE_URL_WOP = 'http://localhost'
+// const AUTH_BASE_URL = `http://localhost:8000`
 
 const Constants = {
         DOMAIN: currentDomain,

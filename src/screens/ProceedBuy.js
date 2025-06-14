@@ -765,7 +765,7 @@ const ProceedBuy = () => {
 
   let locationCond = true;
   const cityCondition = (cityCode, cityList) => {
-    if (!_.isEmpty(cityList) && addressCity !== undefined) {
+    if (!_.isEmpty(cityList) && !_.isEmpty(addressCity)) {
       const cityCodeAddress = cityList.find(
         (c) => c.city_code === JSON.parse(addressCity).city_code
       );

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 import serviceProxy from "../services/serviceProxy";
 import Constants from "../constants";
 import _ from "lodash";
@@ -209,7 +208,7 @@ const RecommendedProducts = () => {
           return (
             <>
               {r?.products?.length > 0 && (
-                <div key={r.id} className="no_rec_cont">
+                <div className="no_rec_cont">
                   <div className="ctitle">
                     <div className="chead_title">
                       {r.title}

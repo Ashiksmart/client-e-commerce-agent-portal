@@ -193,22 +193,22 @@ const OrderOverview = () => {
                   if (trackResult?.records?.length > 0) {
                     const track = trackRecord.find(
                       (t) => t.invoice_id === order.id.toString()
-                    );
-                    track.details.sort(
+                    ) ?? {};
+                    track.details?.sort(
                       (a, b) => new Date(b.created_at) - new Date(a.created_at)
                     );
-                    const records = track.details;
+                    const records = track.details ?? [];
                     const recordLength = records.length;
                     order.isMoved = recordLength > 1;
-                    const orderStatus = records[0].status;
-                    const linkTo = records[0].link_to;
+                    const orderStatus = records[0]?.status;
+                    const linkTo = records[0]?.link_to;
                     const tabActiveCondition =
                       tabActive === "cancelled"
                         ? linkTo === "cancel"
                         : linkTo !== "cancel";
                     if (tabActiveCondition) {
                       order.order_status = orderStatus;
-                      order.orderCreatedAt = records[0].created_at;
+                      order.orderCreatedAt = records[0]?.created_at;
                       order.linkTo = linkTo;
                       if (!_.isEmpty(order)) {
                         const productDetails = JSON.parse(

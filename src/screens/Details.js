@@ -446,7 +446,7 @@ const Details = () => {
       "addressCityooooooooooooooo : ",
       addressCity
     );
-    if (!_.isEmpty(cityList) && addressCity !== undefined) {
+    if (!_.isEmpty(cityList) && !_.isEmpty(addressCity)) {
       console.log(addressCity);
       const cityCodeAddress = cityList.find(
         (c) => c.city_code === JSON.parse(addressCity)?.city_code

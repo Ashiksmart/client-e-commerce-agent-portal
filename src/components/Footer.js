@@ -16,7 +16,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="cfoot">
-                    Designed & Developed by Dreamsparks
+                    Designed & Developed by Frienddey
                 </div>
             </div>
         </div>

@@ -18,7 +18,7 @@ const Cart = () => {
     }, [])
 
     const cityCondition = (cityCode) => {
-        if (!_.isEmpty(cityList) && addressCity !== undefined) {
+        if (!_.isEmpty(cityList) && !_.isEmpty(addressCity)) {
             const cityCodeAddress = cityList.find(c => c.city_code === JSON.parse(addressCity).city_code)
             return cityCode.includes(cityCodeAddress?.city_code?.toString())
         }
